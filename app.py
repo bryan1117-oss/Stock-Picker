@@ -135,7 +135,9 @@ with tab2:
             progress_callback=lambda p,s:(progress.progress(p), status.write(s))
         )
         if rows:
-            df = pd.DataFrame(rows).sort_values(["enhanced_score","weighted_score"], ascending=False).head(int(top_n))
+            # Sort on the display column names actually produced by scan_sp500
+            # ("Enhanced score" / "Core score"), not snake_case variants.
+            df = pd.DataFrame(rows).sort_values(["Enhanced score","Core score"], ascending=False).head(int(top_n))
             st.success(f"Ranked {len(df)} qualifying companies.")
             st.dataframe(df, use_container_width=True, hide_index=True)
             st.download_button("Download ranked CSV", df.to_csv(index=False), "sp500_v2_ranking.csv", "text/csv")
