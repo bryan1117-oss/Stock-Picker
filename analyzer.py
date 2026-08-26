@@ -134,7 +134,11 @@ def sector_normalize(rows):
     pctcols=[c for c in df.columns if c.endswith("_pct")]
     if pctcols:
         df["sector_peer_score"]=df[pctcols].mean(axis=1)*100
-        df["enhanced_score"]=.80*df["enhanced_score"]+.20*df["sector_peer_score"]
+        # FIX: scan_sp500 builds these dicts with the display key "Enhanced score"
+        # (capitalized, spaced), not "enhanced_score". Referencing the snake_case name
+        # raised KeyError as soon as enough rows survived for pctcols to be non-empty.
+        if "Enhanced score" in df:
+            df["Enhanced score"]=.80*df["Enhanced score"]+.20*df["sector_peer_score"]
     return df.to_dict("records")
 
 def scan_sp500(criteria,min_pass=5,progress_callback=None,include_history=True):
